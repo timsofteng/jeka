@@ -1,0 +1,25 @@
+run:
+  concurrency: 2
+  timeout: 10m
+linters:
+  enable-all: true
+  disable:
+    - depguard
+    - gci
+    - zerologlint
+    - execinquery
+    - exportloopref
+    - gomnd
+linters-settings:
+  lll:
+    line-length: 80
+  gomodguard:
+    blocked:
+      modules:
+        - github.com/pkg/errors:
+            recommendations:
+              - errors
+              - fmt
+  exhaustruct:
+    exclude:
+      - '.+/telebot\..+$'

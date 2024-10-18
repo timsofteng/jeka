@@ -30,11 +30,6 @@ test:
 lint:
 	golangci-lint run --concurrency=2
 
-codegen-telegram-http-client:
-	oapi-codegen \
-		-config ./api/telegram-http-client/cfg.yaml \
-		https://raw.githubusercontent.com/PaulSonOfLars/telegram-bot-api-spec/refs/heads/main/api.json
-
 
 ## CONTAINER #####################
 .PHONY:

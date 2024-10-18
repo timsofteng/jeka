@@ -7,6 +7,7 @@ import (
 	"math"
 	apperrors "telegraminput/internal/errors"
 	"telegraminput/internal/logger"
+	rand "telegraminput/services/youtube/internal/rand"
 
 	"github.com/cenkalti/backoff/v4"
 	"golang.org/x/sync/errgroup"
@@ -53,7 +54,7 @@ func mapTriesToQLen(retries uint64) uint {
 	return uint(math.Max(minLen, math.Min(maxLen, float64(retries))))
 }
 
-func (y *Yt) RandVideo() (RandomVideo, error) {
+func (y *Yt) RandVideo() (string, string, error) {
 	operation := func() (string, error) {
 		tries := maxRetries
 
@@ -75,10 +76,10 @@ func (y *Yt) RandVideo() (RandomVideo, error) {
 
 	id, err := backoff.RetryWithData(operation, backoffPolicy)
 	if err != nil {
-		return RandomVideo{}, fmt.Errorf("failed to get rand video id: %w", err)
+		return "", "", fmt.Errorf("failed to get rand video id: %w", err)
 	}
 
-	return RandomVideo{Link: baseURL + id, Caption: caption}, nil
+	return baseURL + id, caption, nil
 }
 
 func (y *Yt) randVideoID(qLen uint) (string, error) {
@@ -92,21 +93,21 @@ func (y *Yt) randVideoID(qLen uint) (string, error) {
 
 	errG.Go(func() error {
 		var err error
-		query, err = randString(qLen)
+		query, err = rand.String(qLen)
 
 		return err
 	})
 
 	errG.Go(func() error {
 		var err error
-		order, err = randOrder()
+		order, err = rand.Order()
 
 		return err
 	})
 
 	errG.Go(func() error {
 		var err error
-		coordinates, err = randCoordinatesStr()
+		coordinates, err = rand.CoordinatesStr()
 
 		return err
 	})

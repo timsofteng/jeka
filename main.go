@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"telegraminput/images"
 	"telegraminput/internal/logger"
+	"telegraminput/services/images"
+	"telegraminput/services/youtube"
 	"telegraminput/transport/telegram"
-	"telegraminput/youtube"
 )
 
 func main() {

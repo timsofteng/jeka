@@ -3,7 +3,7 @@ package telegram
 import (
 	"context"
 	"fmt"
-	"telegraminput/internal/logger"
+	"telegraminput/lib/logger"
 	"time"
 
 	tele "gopkg.in/telebot.v4"

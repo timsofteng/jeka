@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"telegraminput/internal/logger"
+	"telegraminput/lib/logger"
 	"telegraminput/services/images"
 	"telegraminput/services/youtube"
 	"telegraminput/transport/telegram"

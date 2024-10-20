@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	apperrors "telegraminput/internal/errors"
-	"telegraminput/internal/logger"
+	apperrors "telegraminput/lib/errors"
+	"telegraminput/lib/logger"
 	rand "telegraminput/services/youtube/internal/rand"
 
 	"github.com/cenkalti/backoff/v4"

@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	apperrors "telegraminput/internal/errors"
+	apperrors "telegraminput/lib/errors"
 	"time"
 )
 

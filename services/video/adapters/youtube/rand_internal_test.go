@@ -51,7 +51,7 @@ func TestRandString(t *testing.T) {
 	t.Parallel()
 
 	length := 10
-	result, err := String(uint(length))
+	result, err := randString(uint(length))
 
 	require.NoError(t, err, "There should be no error to get random string")
 	assert.Equal(t,
@@ -63,7 +63,7 @@ func TestRandString(t *testing.T) {
 func TestRandOrder(t *testing.T) {
 	t.Parallel()
 
-	result, err := Order()
+	result, err := randOrder()
 
 	require.NoError(t, err, "There should be no error to get random order")
 	assert.IsType(t, "", result, "RandOrder should return a string")

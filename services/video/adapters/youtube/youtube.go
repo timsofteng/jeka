@@ -8,7 +8,6 @@ import (
 	apperrors "telegraminput/lib/errors"
 	"telegraminput/lib/logger"
 	"telegraminput/services/video/entities"
-	rand "telegraminput/services/video/internal/rand"
 
 	"github.com/cenkalti/backoff/v4"
 	"golang.org/x/sync/errgroup"
@@ -100,21 +99,21 @@ func (y *Yt) randVideoID(qLen uint) (string, error) {
 
 	errG.Go(func() error {
 		var err error
-		query, err = rand.String(qLen)
+		query, err = randString(qLen)
 
 		return err
 	})
 
 	errG.Go(func() error {
 		var err error
-		order, err = rand.Order()
+		order, err = randOrder()
 
 		return err
 	})
 
 	errG.Go(func() error {
 		var err error
-		coordinates, err = rand.CoordinatesStr()
+		coordinates, err = randCoordinatesStr()
 
 		return err
 	})

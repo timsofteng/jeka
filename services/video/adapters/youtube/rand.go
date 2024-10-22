@@ -6,7 +6,7 @@ import (
 	"math/big"
 )
 
-func Uint(max uint) (uint, error) {
+func randUint(max uint) (uint, error) {
 	var min uint
 	diff := max - min + 1
 
@@ -18,12 +18,12 @@ func Uint(max uint) (uint, error) {
 	return min + uint(n.Int64()), nil
 }
 
-func Float64(min, max float64) (float64, error) {
+func randFloat64(min, max float64) (float64, error) {
 	var maxRandomValue uint = 1_000_000
 
 	ratioScale := float64(maxRandomValue)
 
-	randUint, err := Uint(maxRandomValue)
+	randUint, err := randUint(maxRandomValue)
 	if err != nil {
 		return 0, err
 	}
@@ -33,7 +33,7 @@ func Float64(min, max float64) (float64, error) {
 	return min + ratio*(max-min), nil
 }
 
-func CoordinatesStr() (string, error) {
+func randCoordinatesStr() (string, error) {
 	var (
 		minLat float64 = -90
 		maxLat float64 = 90
@@ -42,12 +42,12 @@ func CoordinatesStr() (string, error) {
 		maxLong float64 = 180
 	)
 
-	latitude, err := Float64(minLat, maxLat)
+	latitude, err := randFloat64(minLat, maxLat)
 	if err != nil {
 		return "", err
 	}
 
-	longitude, err := Float64(minLong, maxLong)
+	longitude, err := randFloat64(minLong, maxLong)
 	if err != nil {
 		return "", err
 	}
@@ -60,7 +60,7 @@ func randEnStringRunes(n uint) (string, error) {
 		"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	runes := make([]rune, n)
 
-	randRuneIdx, err := Uint(uint(len(enLetterRunes)))
+	randRuneIdx, err := randUint(uint(len(enLetterRunes)))
 	if err != nil {
 		return "", err
 	}
@@ -77,7 +77,7 @@ func randUaStringRunes(n uint) (string, error) {
 		"абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ")
 	runes := make([]rune, n)
 
-	randRuneIdx, err := Uint(uint(len(uaLetterRunes)))
+	randRuneIdx, err := randUint(uint(len(uaLetterRunes)))
 	if err != nil {
 		return "", err
 	}
@@ -89,11 +89,11 @@ func randUaStringRunes(n uint) (string, error) {
 	return string(runes), nil
 }
 
-func String(strLen uint) (string, error) {
+func randString(strLen uint) (string, error) {
 	var fns []func(n uint) (string, error)
 	fns = append(fns, randEnStringRunes, randUaStringRunes)
 
-	randLangFn, err := Uint(uint(len(fns)))
+	randLangFn, err := randUint(uint(len(fns)))
 	if err != nil {
 		return "", err
 	}
@@ -101,12 +101,12 @@ func String(strLen uint) (string, error) {
 	return fns[randLangFn](strLen)
 }
 
-func Order() (string, error) {
+func randOrder() (string, error) {
 	orders := [6]string{
 		"date", "rating", "relevance", "title", "videoCount", "viewCount",
 	}
 
-	randomIndex, err := Uint(uint(len(orders)))
+	randomIndex, err := randUint(uint(len(orders)))
 	if err != nil {
 		return "", err
 	}

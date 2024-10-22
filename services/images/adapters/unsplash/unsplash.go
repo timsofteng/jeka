@@ -1,9 +1,10 @@
-package images
+package unsplash
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"telegraminput/services/images/entities"
 
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/net/context"
@@ -17,48 +18,51 @@ type resp struct {
 	ID string `json:"id" validate:"required"`
 }
 
-type Images struct {
+type Unsplash struct {
 	validate   *validator.Validate
 	httpClient httpClient
 }
 
-func New(unsplashClientID string) *Images {
+func New(unsplashClientID string) *Unsplash {
 	validate := validator.New()
 
-	return &Images{
+	return &Unsplash{
 		httpClient: newHTTPClient(unsplashClientID),
 		validate:   validate,
 	}
 }
 
-func (c Images) Taksa(ctx context.Context) (string, string, error) {
-	const (
-		caption = "Собака умная может и самоутилизироваться )\n😍😍😍😍"
-		query   = "dachshund"
-	)
+func (c Unsplash) Taksa(ctx context.Context) (entities.Taska, error) {
+	const query = "dachshund"
 
 	url, err := c.randomImg(ctx, query)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to get random img: %w", err)
+		return entities.Taska{}, fmt.Errorf("failed to get random img: %w", err)
 	}
 
-	return url, caption, nil
+	taksa, err := entities.NewTaska(url)
+	if err != nil {
+		return entities.Taska{}, fmt.Errorf("failed to create new taska: %w", err)
+	}
+
+	return taksa, nil
 }
 
-func (c Images) RandomImg(ctx context.Context) (string, string, error) {
-	const (
-		caption = "вообще рандомно:"
-	)
-
+func (c Unsplash) RandImg(ctx context.Context) (entities.RandImg, error) {
 	url, err := c.randomImg(ctx, "")
 	if err != nil {
-		return "", "", fmt.Errorf("failed to get random img: %w", err)
+		return entities.RandImg{}, fmt.Errorf("failed to get random img: %w", err)
 	}
 
-	return url, caption, nil
+	img, err := entities.NewRandImg(url)
+	if err != nil {
+		return entities.RandImg{}, fmt.Errorf("failed to create new taska: %w", err)
+	}
+
+	return img, nil
 }
 
-func (c Images) randomImg(ctx context.Context,
+func (c Unsplash) randomImg(ctx context.Context,
 	query string,
 ) (string, error) {
 	req, err := http.NewRequestWithContext(

@@ -7,7 +7,8 @@ import (
 	"math"
 	apperrors "telegraminput/lib/errors"
 	"telegraminput/lib/logger"
-	rand "telegraminput/services/youtube/internal/rand"
+	"telegraminput/services/video/entities"
+	rand "telegraminput/services/video/internal/rand"
 
 	"github.com/cenkalti/backoff/v4"
 	"golang.org/x/sync/errgroup"
@@ -21,7 +22,6 @@ type Yt struct {
 }
 
 const (
-	caption           = "Взгляните на это видео:\n\n"
 	baseURL           = "https://www.youtube.com/watch?v="
 	radius            = "1000km"
 	maxRetries uint64 = 4
@@ -54,7 +54,7 @@ func mapTriesToQLen(retries uint64) uint {
 	return uint(math.Max(minLen, math.Min(maxLen, float64(retries))))
 }
 
-func (y *Yt) RandVideo() (string, string, error) {
+func (y *Yt) RandVideo() (entities.RandVideo, error) {
 	operation := func() (string, error) {
 		tries := maxRetries
 
@@ -74,12 +74,19 @@ func (y *Yt) RandVideo() (string, string, error) {
 	backoffPolicy := backoff.WithMaxRetries(
 		backoff.NewExponentialBackOff(), maxRetries)
 
-	id, err := backoff.RetryWithData(operation, backoffPolicy)
+	videoID, err := backoff.RetryWithData(operation, backoffPolicy)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to get rand video id: %w", err)
+		return entities.RandVideo{},
+			fmt.Errorf("failed to get rand video id: %w", err)
 	}
 
-	return baseURL + id, caption, nil
+	video, err := entities.NewRandVideo(baseURL + videoID)
+	if err != nil {
+		return entities.RandVideo{},
+			fmt.Errorf("failed to create new rand video: %w", err)
+	}
+
+	return video, nil
 }
 
 func (y *Yt) randVideoID(qLen uint) (string, error) {

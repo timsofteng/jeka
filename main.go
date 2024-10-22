@@ -6,8 +6,11 @@ import (
 	"os"
 	"telegraminput/lib/logger"
 	"telegraminput/services/images"
-	"telegraminput/services/youtube"
-	"telegraminput/transport/telegram"
+	"telegraminput/services/images/adapters/unsplash"
+	"telegraminput/services/telegram"
+	tgAdapters "telegraminput/services/telegram/adapters"
+	"telegraminput/services/video"
+	"telegraminput/services/video/adapters/youtube"
 )
 
 func main() {
@@ -26,19 +29,23 @@ func run() error {
 
 	logger := logger.New(cfg.LogLevel)
 
-	ytSrv, err := youtube.New(logger, cfg.YtAPIKey)
+	videoRepo, err := youtube.New(logger, cfg.YtAPIKey)
 	if err != nil {
-		return fmt.Errorf("failed to init youtube service: %w", err)
+		return fmt.Errorf("failed to init youtube repo adapter: %w", err)
 	}
 
-	imgSrv := images.New(cfg.UnsplashAPIKey)
+	videoSrv := video.New(videoRepo)
+
+	imgRepo := unsplash.New(cfg.UnsplashAPIKey)
+	imgSrv := images.New(imgRepo)
+
+	tgAdoptedServices := tgAdapters.New(tgAdapters.Services{
+		Video: videoSrv, Image: imgSrv,
+	})
 
 	telegram, err := telegram.New(logger,
 		cfg.Token,
-		telegram.Services{
-			Video: ytSrv,
-			Image: imgSrv,
-		},
+		tgAdoptedServices,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to init telegram service: %w", err)

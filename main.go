@@ -8,7 +8,9 @@ import (
 	"telegraminput/services/images"
 	"telegraminput/services/images/adapters/unsplash"
 	"telegraminput/services/telegram"
-	tgAdapters "telegraminput/services/telegram/adapters"
+	tgAdapters "telegraminput/services/telegram/adapters/services"
+	"telegraminput/services/text"
+	"telegraminput/services/text/adapters/postgres"
 	"telegraminput/services/video"
 	"telegraminput/services/video/adapters/youtube"
 )
@@ -39,12 +41,20 @@ func run() error {
 	imgRepo := unsplash.New(cfg.UnsplashAPIKey)
 	imgSrv := images.New(imgRepo)
 
+	textRepo, err := postgres.New(cfg.DatabaseURL)
+	if err != nil {
+		return fmt.Errorf("failed to init postgres text repo adapter: %w", err)
+	}
+
+	textSrv := text.New(textRepo)
+
 	tgAdoptedServices := tgAdapters.New(tgAdapters.Services{
-		Video: videoSrv, Image: imgSrv,
+		Video: videoSrv, Image: imgSrv, Text: textSrv,
 	})
 
 	telegram, err := telegram.New(logger,
 		cfg.Token,
+		cfg.BotOwnUsername,
 		tgAdoptedServices,
 	)
 	if err != nil {

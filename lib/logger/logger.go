@@ -35,7 +35,7 @@ func replacer(_ []string, attr slog.Attr) slog.Attr {
 	wd, _ := os.Getwd()
 
 	if attr.Key == slog.SourceKey {
-		//nolint
+		//nolint:forcetypeassert
 		source := attr.Value.Any().(*slog.Source)
 		if file, ok := strings.CutPrefix(source.File, wd); ok {
 			source.File = file

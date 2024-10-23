@@ -8,6 +8,7 @@ import (
 	apperrors "telegraminput/lib/errors"
 	"telegraminput/lib/logger"
 	"telegraminput/services/video/entities"
+	"time"
 
 	"github.com/cenkalti/backoff/v4"
 	"golang.org/x/sync/errgroup"
@@ -27,14 +28,15 @@ const (
 )
 
 func New(logger logger.Logger, apiKey string) (*Yt, error) {
-	ctx := context.Background()
+	const timeout = 10 * time.Second
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
 	ytClient, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create youtube service: %w", err)
 	}
-
-	logger.Debug("youtube service has been started")
 
 	return &Yt{
 		yt:     ytClient,
@@ -53,13 +55,13 @@ func mapTriesToQLen(retries uint64) uint {
 	return uint(math.Max(minLen, math.Min(maxLen, float64(retries))))
 }
 
-func (y *Yt) RandVideo() (entities.RandVideo, error) {
+func (y *Yt) RandVideo(ctx context.Context) (entities.RandVideo, error) {
 	operation := func() (string, error) {
 		tries := maxRetries
 
 		return func() (string, error) {
 			qLen := mapTriesToQLen(tries)
-			videoID, err := y.randVideoID(qLen)
+			videoID, err := y.randVideoID(ctx, qLen)
 			tries--
 
 			if err != nil && !errors.Is(err, apperrors.ErrNotExisted) {
@@ -88,7 +90,7 @@ func (y *Yt) RandVideo() (entities.RandVideo, error) {
 	return video, nil
 }
 
-func (y *Yt) randVideoID(qLen uint) (string, error) {
+func (y *Yt) randVideoID(ctx context.Context, qLen uint) (string, error) {
 	var (
 		query       string
 		order       string
@@ -122,13 +124,17 @@ func (y *Yt) randVideoID(qLen uint) (string, error) {
 		return "", fmt.Errorf("cannot create random data: %w", err)
 	}
 
-	return y.videoID(query, order, coordinates, radius)
+	return y.videoID(ctx, query, order, coordinates, radius)
 }
 
 func (y *Yt) videoID(
-	query string, order string, coordinates string, radius string,
+	ctx context.Context,
+	query string,
+	order string,
+	coordinates string,
+	radius string,
 ) (string, error) {
-	request := y.yt.Search.List([]string{"id"})
+	request := y.yt.Search.List([]string{"id"}).Context(ctx)
 
 	request.Q(query)
 	request.MaxResults(1)

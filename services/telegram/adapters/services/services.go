@@ -1,15 +1,17 @@
-package adapters
+package services
 
 import (
 	"context"
 	"fmt"
 	"telegraminput/services/images"
+	"telegraminput/services/text"
 	"telegraminput/services/video"
 )
 
 type Services struct {
 	Video *video.Video
 	Image *images.Images
+	Text  *text.Text
 }
 
 type Adapters struct {
@@ -22,8 +24,8 @@ func New(services Services) *Adapters {
 	}
 }
 
-func (a *Adapters) RandVideo() (string, error) {
-	video, err := a.services.Video.RandVideo()
+func (a *Adapters) RandVideo(ctx context.Context) (string, error) {
+	video, err := a.services.Video.RandVideo(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to call Video.RandVideo: %w", err)
 	}
@@ -47,4 +49,13 @@ func (a *Adapters) Taksa(ctx context.Context) (string, error) {
 	}
 
 	return fmt.Sprintf("%s \n %s", taksa.Caption, taksa.URL), nil
+}
+
+func (a *Adapters) RandText(ctx context.Context) (string, error) {
+	res, err := a.services.Text.Rand(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to call Image.Taska: %w", err)
+	}
+
+	return res.Text, nil
 }

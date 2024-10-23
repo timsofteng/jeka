@@ -6,12 +6,14 @@ import (
 	"telegraminput/services/images"
 	"telegraminput/services/text"
 	"telegraminput/services/video"
+	"telegraminput/services/voice"
 )
 
 type Services struct {
 	Video *video.Video
 	Image *images.Images
 	Text  *text.Text
+	Voice *voice.Voice
 }
 
 type Adapters struct {
@@ -54,8 +56,17 @@ func (a *Adapters) Taksa(ctx context.Context) (string, error) {
 func (a *Adapters) RandText(ctx context.Context) (string, error) {
 	res, err := a.services.Text.Rand(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to call Image.Taska: %w", err)
+		return "", fmt.Errorf("failed to call randtext: %w", err)
 	}
 
 	return res.Text, nil
+}
+
+func (a *Adapters) RandVoice(ctx context.Context) (string, error) {
+	res, err := a.services.Voice.Rand(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to call rand voice: %w", err)
+	}
+
+	return res.ID, nil
 }

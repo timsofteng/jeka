@@ -7,4 +7,5 @@ type Services interface {
 	RandImg(ctx context.Context) (url string, err error)
 	Taksa(ctx context.Context) (respWithURL string, err error)
 	RandText(ctx context.Context) (text string, err error)
+	RandVoice(ctx context.Context) (id string, err error)
 }

@@ -49,12 +49,28 @@ func (t *Telegram) handlers() {
 
 		resp, err := t.services.Taksa(ctx)
 		if err != nil {
-			t.logger.Error("error to call image/taksa service", "err", err)
+			t.logger.Error("error to call taksa service", "err", err)
 
 			return ctxTb.Send(errCommon.Error())
 		}
 
 		return ctxTb.Send(resp)
+	})
+
+	t.bot.Handle("/voice", func(ctxTb tele.Context) error {
+		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		defer cancel()
+
+		voiceID, err := t.services.RandVoice(ctx)
+		if err != nil {
+			t.logger.Error("error to call image/taksa service", "err", err)
+
+			return ctxTb.Send(errCommon.Error())
+		}
+
+		voice := &tele.Voice{File: tele.File{FileID: voiceID}}
+
+		return ctxTb.Reply(voice)
 	})
 
 	textHandler := func(ctxTb tele.Context) error {
@@ -95,3 +111,27 @@ func (t *Telegram) handlers() {
 		return nil
 	})
 }
+
+// t.bot.Handle(tele.OnVoice, func(ctxTb tele.Context) error {
+// 	voiceID := ctxTb.Message().Voice.FileID
+// 	file, err := os.OpenFile(
+// "voices.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+// 	defer file.Close()
+//
+// 	if err != nil {
+// 		log.Printf("Failed to open file: %v", err)
+//
+// 		return err
+// 	}
+//
+// 	_, err = file.WriteString(voiceID + "\n")
+// 	if err != nil {
+// 		log.Printf("Failed to write to file: %v", err)
+//
+// 		return err
+// 	}
+//
+// 	log.Printf("Voice ID saved: %s", voiceID)
+//
+// 	return nil
+// })

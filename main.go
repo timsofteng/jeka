@@ -5,14 +5,17 @@ import (
 	"log"
 	"os"
 	"telegraminput/lib/logger"
+	"telegraminput/lib/postgres"
 	"telegraminput/services/images"
 	"telegraminput/services/images/adapters/unsplash"
 	"telegraminput/services/telegram"
 	tgAdapters "telegraminput/services/telegram/adapters/services"
 	"telegraminput/services/text"
-	"telegraminput/services/text/adapters/postgres"
+	textPGAdapter "telegraminput/services/text/adapters/postgres"
 	"telegraminput/services/video"
 	"telegraminput/services/video/adapters/youtube"
+	"telegraminput/services/voice"
+	voicePGAdapter "telegraminput/services/voice/adapters/postgres"
 )
 
 func main() {
@@ -41,15 +44,19 @@ func run() error {
 	imgRepo := unsplash.New(cfg.UnsplashAPIKey)
 	imgSrv := images.New(imgRepo)
 
-	textRepo, err := postgres.New(cfg.DatabaseURL)
+	postgres, err := postgres.New(cfg.DatabaseURL)
 	if err != nil {
-		return fmt.Errorf("failed to init postgres text repo adapter: %w", err)
+		return fmt.Errorf("failed to init postgres db: %w", err)
 	}
 
+	textRepo := textPGAdapter.New(postgres.Conn)
 	textSrv := text.New(textRepo)
 
+	voiceRepo := voicePGAdapter.New(postgres.Conn)
+	voiceSrv := voice.New(voiceRepo)
+
 	tgAdoptedServices := tgAdapters.New(tgAdapters.Services{
-		Video: videoSrv, Image: imgSrv, Text: textSrv,
+		Video: videoSrv, Image: imgSrv, Text: textSrv, Voice: voiceSrv,
 	})
 
 	telegram, err := telegram.New(logger,

@@ -4,31 +4,19 @@ import (
 	"context"
 	"fmt"
 	"telegraminput/services/text/entities"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 )
 
-type Repo struct {
+type Postgres struct {
 	conn *pgx.Conn
 }
 
-func New(dbURL string) (*Repo, error) {
-	const timeout = 5 * time.Second
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	conn, err := pgx.Connect(ctx, dbURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed connect to db: %w", err)
-	}
-	// defer conn.Close(ctx)
-
-	return &Repo{conn: conn}, nil
+func New(db *pgx.Conn) *Postgres {
+	return &Postgres{conn: db}
 }
 
-func (r *Repo) Rand(ctx context.Context) (entities.RandText, error) {
+func (r *Postgres) Rand(ctx context.Context) (entities.RandText, error) {
 	query := `SELECT data FROM text ORDER BY RANDOM() LIMIT 1;`
 	randMsg := ""
 
@@ -47,7 +35,7 @@ func (r *Repo) Rand(ctx context.Context) (entities.RandText, error) {
 	return text, nil
 }
 
-func (r *Repo) Count(ctx context.Context) (uint, error) {
+func (r *Postgres) Count(ctx context.Context) (uint, error) {
 	var count uint
 
 	query := `SELECT count(*) FROM text`
@@ -60,7 +48,7 @@ func (r *Repo) Count(ctx context.Context) (uint, error) {
 	return count, nil
 }
 
-func (r *Repo) Add(ctx context.Context, message string) error {
+func (r *Postgres) Add(ctx context.Context, message string) error {
 	query := "INSERT INTO text (data) VALUES ($1)"
 
 	_, err := r.conn.Exec(ctx, query, message)

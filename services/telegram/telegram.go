@@ -25,7 +25,8 @@ func New(
 	const pollerTimeout = 10 * time.Second
 
 	pref := tele.Settings{
-		Token: token,
+		OnError: onError(logger),
+		Token:   token,
 		Poller: &tele.LongPoller{
 			Limit:   0,
 			Timeout: pollerTimeout,
@@ -47,6 +48,19 @@ func New(
 	telegram.handlers()
 
 	return telegram, nil
+}
+
+func onError(logger logger.Logger) func(error, tele.Context) {
+	return func(err error, c tele.Context) {
+		logger.Error("unhandled telebot error", "error", err)
+
+		err = c.Send(errCommon.Error())
+		if err != nil {
+			logger.Error("failed to send client error in error handler",
+				"err", err,
+			)
+		}
+	}
 }
 
 func (t *Telegram) Start() {

@@ -7,4 +7,6 @@ var (
 	ErrNotExisted     = errors.New("not existed")
 	ErrNotFound       = errors.New("not found")
 	ErrExternal       = errors.New("external call error")
+	ErrInternal       = errors.New("something went wrong")
+	ErrTimout         = errors.New("timeout error")
 )

@@ -1,0 +1,54 @@
+openapi: 3.0.0
+info:
+  title: jeka API
+  version: 1.0.0
+  description: This is a documentation for jeka.
+servers:
+  - url: /api/v1
+tags:
+  - name: text
+    description: Everything related to text
+paths:
+  /rand-text:
+    get:
+      operationId: randText
+      summary: Get random text
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RandTextResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "408":
+          description: Timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Description of the error
+          example: Internal server error occurred
+      required:
+        - message
+    RandTextResponse:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Random message
+          example: Vim for everyone
+      required:
+        - text

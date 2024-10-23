@@ -35,22 +35,22 @@ func (a *Adapters) RandVideo(ctx context.Context) (string, error) {
 	return fmt.Sprintf("%s \n %s", video.Caption, video.URL), nil
 }
 
-func (a *Adapters) RandImg(ctx context.Context) (string, error) {
+func (a *Adapters) RandImg(ctx context.Context) (string, string, error) {
 	img, err := a.services.Image.RandImg(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to call Image.RandImg: %w", err)
+		return "", "", fmt.Errorf("failed to call Image.RandImg: %w", err)
 	}
 
-	return fmt.Sprintf("%s \n %s", img.Caption, img.URL), nil
+	return img.URL, img.Caption, nil
 }
 
-func (a *Adapters) Taksa(ctx context.Context) (string, error) {
+func (a *Adapters) Taksa(ctx context.Context) (string, string, error) {
 	taksa, err := a.services.Image.Taksa(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to call Image.Taska: %w", err)
+		return "", "", fmt.Errorf("failed to call Image.Taska: %w", err)
 	}
 
-	return fmt.Sprintf("%s \n %s", taksa.Caption, taksa.URL), nil
+	return taksa.URL, taksa.Caption, nil
 }
 
 func (a *Adapters) RandText(ctx context.Context) (string, error) {

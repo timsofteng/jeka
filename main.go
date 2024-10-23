@@ -6,6 +6,8 @@ import (
 	"os"
 	"telegraminput/lib/logger"
 	"telegraminput/lib/postgres"
+	"telegraminput/services/httpserver"
+	httpSrvAdapter "telegraminput/services/httpserver/adapters/services"
 	"telegraminput/services/images"
 	"telegraminput/services/images/adapters/unsplash"
 	"telegraminput/services/telegram"
@@ -68,7 +70,20 @@ func run() error {
 		return fmt.Errorf("failed to init telegram service: %w", err)
 	}
 
-	telegram.Start()
+	go telegram.Start()
+
+	httpSrv := httpSrvAdapter.New(httpSrvAdapter.Services{
+		Video: videoSrv, Image: imgSrv, Text: textSrv, Voice: voiceSrv,
+	})
+
+	httpServer, err := httpserver.New(
+		logger, cfg.HTTPServerHost, cfg.HTTPServerPort, httpSrv,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to init http server: %w", err)
+	}
+
+	httpServer.Start()
 
 	return nil
 }

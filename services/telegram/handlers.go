@@ -9,10 +9,21 @@ import (
 
 const defaultTimeout = 2 * time.Second
 
+const helpMsg = `/help - инструкция
+/voice - голосовое
+/text - текст
+/video - видео
+/rand_img - случайное изображение
+/taksa - такса`
+
 //nolint:funlen
 func (t *Telegram) handlers() {
 	t.bot.Handle("/test", func(c tele.Context) error {
 		return c.Send("Hello!")
+	})
+
+	t.bot.Handle("/help", func(c tele.Context) error {
+		return c.Send(helpMsg)
 	})
 
 	t.bot.Handle("/video", func(ctxTb tele.Context) error {
@@ -29,32 +40,36 @@ func (t *Telegram) handlers() {
 		return ctxTb.Send(resp)
 	})
 
-	t.bot.Handle("/random-img", func(ctxTb tele.Context) error {
+	t.bot.Handle("/rand_img", func(ctxTb tele.Context) error {
 		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 		defer cancel()
 
-		resp, err := t.services.RandImg(ctx)
+		url, caption, err := t.services.RandImg(ctx)
 		if err != nil {
 			t.logger.Error("error to call image/randomimg service", "err", err)
 
 			return ctxTb.Send(errCommon.Error())
 		}
 
-		return ctxTb.Send(resp)
+		photo := &tele.Photo{File: tele.File{FileURL: url}, Caption: caption}
+
+		return ctxTb.Send(photo)
 	})
 
 	t.bot.Handle("/taksa", func(ctxTb tele.Context) error {
 		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 		defer cancel()
 
-		resp, err := t.services.Taksa(ctx)
+		url, caption, err := t.services.Taksa(ctx)
 		if err != nil {
 			t.logger.Error("error to call taksa service", "err", err)
 
 			return ctxTb.Send(errCommon.Error())
 		}
 
-		return ctxTb.Send(resp)
+		photo := &tele.Photo{File: tele.File{FileURL: url}, Caption: caption}
+
+		return ctxTb.Send(photo)
 	})
 
 	t.bot.Handle("/voice", func(ctxTb tele.Context) error {

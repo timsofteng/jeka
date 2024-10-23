@@ -30,6 +30,11 @@ test:
 lint:
 	golangci-lint run --concurrency=2
 
+.PHONY:
+codegen-http-server-handler:
+	oapi-codegen \
+		-config ./tool/openapi-server.cfg.yaml \
+		 ./api/openapi.yaml
 
 ## CONTAINER #####################
 .PHONY:

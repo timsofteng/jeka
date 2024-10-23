@@ -1,5 +1,5 @@
 package: httpserver
-output: services/httpserver/handlers.gen.go
+output: services/httpserver/oapi.gen.go
 generate:
   embedded-spec: true
   models: true

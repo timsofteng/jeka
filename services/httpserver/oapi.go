@@ -42,7 +42,7 @@ func responseErrorHandler(
 	w http.ResponseWriter, _ *http.Request, err error,
 ) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(mapInternalErrorToHTTPStatusCode(err))
+	// w.WriteHeader(mapInternalErrorToHTTPStatusCode(err))
 
 	encodeErr := json.NewEncoder(w).Encode(err)
 	if encodeErr != nil {

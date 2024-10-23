@@ -3,10 +3,13 @@ package services
 import (
 	"context"
 	"fmt"
+	"math/rand/v2"
 	"telegraminput/services/images"
 	"telegraminput/services/text"
 	"telegraminput/services/video"
 	"telegraminput/services/voice"
+
+	tele "gopkg.in/telebot.v4"
 )
 
 type Services struct {
@@ -24,6 +27,15 @@ func New(services Services) *Adapters {
 	return &Adapters{
 		services: services,
 	}
+}
+
+func (a *Adapters) Rand(ctx context.Context) (any, error) {
+	//nolint:gosec,mnd
+	if rand.IntN(100) < 85 {
+		return a.RandText(ctx)
+	}
+
+	return a.RandVoice(ctx)
 }
 
 func (a *Adapters) RandVideo(ctx context.Context) (string, error) {
@@ -62,11 +74,11 @@ func (a *Adapters) RandText(ctx context.Context) (string, error) {
 	return res.Text, nil
 }
 
-func (a *Adapters) RandVoice(ctx context.Context) (string, error) {
+func (a *Adapters) RandVoice(ctx context.Context) (*tele.Voice, error) {
 	res, err := a.services.Voice.Rand(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to call rand voice: %w", err)
+		return nil, fmt.Errorf("failed to call rand voice: %w", err)
 	}
 
-	return res.ID, nil
+	return &tele.Voice{File: tele.File{FileID: res.ID}}, nil
 }

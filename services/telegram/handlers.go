@@ -10,6 +10,7 @@ import (
 const defaultTimeout = 2 * time.Second
 
 const helpMsg = `/help - инструкция
+/rand - голосовое или текстовое
 /voice - голосовое
 /text - текст
 /video - видео
@@ -72,18 +73,30 @@ func (t *Telegram) handlers() {
 		return ctxTb.Send(photo)
 	})
 
+	t.bot.Handle("/rand", func(ctxTb tele.Context) error {
+		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		defer cancel()
+
+		resp, err := t.services.Rand(ctx)
+		if err != nil {
+			t.logger.Error("error to call rand service", "err", err)
+
+			return ctxTb.Send(errCommon.Error())
+		}
+
+		return ctxTb.Reply(resp)
+	})
+
 	t.bot.Handle("/voice", func(ctxTb tele.Context) error {
 		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 		defer cancel()
 
-		voiceID, err := t.services.RandVoice(ctx)
+		voice, err := t.services.RandVoice(ctx)
 		if err != nil {
 			t.logger.Error("error to call image/taksa service", "err", err)
 
 			return ctxTb.Send(errCommon.Error())
 		}
-
-		voice := &tele.Voice{File: tele.File{FileID: voiceID}}
 
 		return ctxTb.Reply(voice)
 	})

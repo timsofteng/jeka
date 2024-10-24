@@ -31,28 +31,26 @@ func (t *Telegram) handlers(ctx context.Context) {
 		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
-		resp, err := t.services.RandVideo(ctx)
+		video, err := t.services.RandVideo(ctx)
 		if err != nil {
 			t.logger.Error("/video handler", "err", err)
 
 			return ctxTb.Send(errCommon.Error())
 		}
 
-		return ctxTb.Send(resp)
+		return ctxTb.Send(video)
 	})
 
 	t.bot.Handle("/rand_img", func(ctxTb tele.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
-		url, caption, err := t.services.RandImg(ctx)
+		photo, err := t.services.RandImg(ctx)
 		if err != nil {
 			t.logger.Error("error to call image/randomimg service", "err", err)
 
 			return ctxTb.Send(errCommon.Error())
 		}
-
-		photo := &tele.Photo{File: tele.File{FileURL: url}, Caption: caption}
 
 		return ctxTb.Send(photo)
 	})
@@ -61,14 +59,12 @@ func (t *Telegram) handlers(ctx context.Context) {
 		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
-		url, caption, err := t.services.Taksa(ctx)
+		photo, err := t.services.Taksa(ctx)
 		if err != nil {
 			t.logger.Error("error to call taksa service", "err", err)
 
 			return ctxTb.Send(errCommon.Error())
 		}
-
-		photo := &tele.Photo{File: tele.File{FileURL: url}, Caption: caption}
 
 		return ctxTb.Send(photo)
 	})

@@ -39,31 +39,43 @@ func (a *Adapters) Rand(ctx context.Context) (any, error) {
 	return a.RandVoice(ctx)
 }
 
-func (a *Adapters) RandVideo(ctx context.Context) (string, error) {
-	video, err := a.services.Video.RandVideo(ctx)
+func (a *Adapters) RandVideo(ctx context.Context) (*tele.Video, error) {
+	resp, err := a.services.Video.RandVideo(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to call Video.RandVideo: %w", err)
+		return nil, fmt.Errorf("failed to call Video.RandVideo: %w", err)
 	}
 
-	return fmt.Sprintf("%s \n %s", video.Caption, video.URL), nil
+	video := &tele.Video{
+		File: tele.File{FileURL: resp.URL}, Caption: resp.Caption,
+	}
+
+	return video, nil
 }
 
-func (a *Adapters) RandImg(ctx context.Context) (string, string, error) {
+func (a *Adapters) RandImg(ctx context.Context) (*tele.Photo, error) {
 	img, err := a.services.Image.RandImg(ctx)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to call Image.RandImg: %w", err)
+		return nil, fmt.Errorf("failed to call Image.RandImg: %w", err)
 	}
 
-	return img.URL, img.Caption, nil
+	photo := &tele.Photo{
+		File: tele.File{FileURL: img.URL}, Caption: img.Caption,
+	}
+
+	return photo, nil
 }
 
-func (a *Adapters) Taksa(ctx context.Context) (string, string, error) {
-	taksa, err := a.services.Image.Taksa(ctx)
+func (a *Adapters) Taksa(ctx context.Context) (*tele.Photo, error) {
+	img, err := a.services.Image.Taksa(ctx)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to call Image.Taska: %w", err)
+		return nil, fmt.Errorf("failed to call Image.Taska: %w", err)
 	}
 
-	return taksa.URL, taksa.Caption, nil
+	photo := &tele.Photo{
+		File: tele.File{FileURL: img.URL}, Caption: img.Caption,
+	}
+
+	return photo, nil
 }
 
 func (a *Adapters) RandText(ctx context.Context) (string, error) {

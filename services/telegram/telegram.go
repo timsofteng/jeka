@@ -8,7 +8,6 @@ import (
 	"github.com/timsofteng/jeka/lib/logger"
 	"github.com/timsofteng/jeka/services/telegram/ports"
 
-	"golang.org/x/sync/errgroup"
 	tele "gopkg.in/telebot.v4"
 )
 
@@ -37,23 +36,9 @@ func New(
 		},
 	}
 
-	gErrGr, ctx := errgroup.WithContext(ctx)
-
-	var bot *tele.Bot
-
-	gErrGr.Go(func() error {
-		var err error
-
-		bot, err = tele.NewBot(pref)
-		if err != nil {
-			return fmt.Errorf("failed to init tg bot: %w", err)
-		}
-
-		return nil
-	})
-
-	if err := gErrGr.Wait(); err != nil {
-		return nil, fmt.Errorf("error group encountered an error: %w", err)
+	bot, err := tele.NewBot(pref)
+	if err != nil {
+		return nil, fmt.Errorf("failed to init tg bot: %w", err)
 	}
 
 	telegram := &Telegram{

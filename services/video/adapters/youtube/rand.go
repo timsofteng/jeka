@@ -3,6 +3,7 @@ package youtube
 import (
 	"crypto/rand"
 	"fmt"
+	"log"
 	"math/big"
 )
 
@@ -60,12 +61,12 @@ func randEnStringRunes(n uint) (string, error) {
 		"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	runes := make([]rune, n)
 
-	randRuneIdx, err := randUint(uint(len(enLetterRunes)))
-	if err != nil {
-		return "", err
-	}
-
 	for i := range runes {
+		randRuneIdx, err := randUint(uint(len(enLetterRunes)))
+		if err != nil {
+			return "", err
+		}
+
 		runes[i] = enLetterRunes[randRuneIdx]
 	}
 
@@ -77,12 +78,12 @@ func randUaStringRunes(n uint) (string, error) {
 		"абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ")
 	runes := make([]rune, n)
 
-	randRuneIdx, err := randUint(uint(len(uaLetterRunes)))
-	if err != nil {
-		return "", err
-	}
-
 	for i := range runes {
+		randRuneIdx, err := randUint(uint(len(uaLetterRunes)))
+		if err != nil {
+			return "", err
+		}
+
 		runes[i] = uaLetterRunes[randRuneIdx]
 	}
 
@@ -93,10 +94,13 @@ func randString(strLen uint) (string, error) {
 	var fns []func(n uint) (string, error)
 	fns = append(fns, randEnStringRunes, randUaStringRunes)
 
-	randLangFn, err := randUint(uint(len(fns)))
+	randLangFn, err := randUint(uint(len(fns)) - 1)
 	if err != nil {
 		return "", err
 	}
+
+	res, _ := fns[randLangFn](strLen)
+	log.Printf("res: %s", res)
 
 	return fns[randLangFn](strLen)
 }
@@ -106,7 +110,7 @@ func randOrder() (string, error) {
 		"date", "rating", "relevance", "title", "videoCount", "viewCount",
 	}
 
-	randomIndex, err := randUint(uint(len(orders)))
+	randomIndex, err := randUint(uint(len(orders)) - 1)
 	if err != nil {
 		return "", err
 	}

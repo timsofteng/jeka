@@ -1,4 +1,4 @@
-# .DELETE_ON_ERROR:
+.DELETE_ON_ERROR:
 
 .PHONY:
 build:
@@ -27,6 +27,14 @@ test:
 .PHONY:
 lint:
 	golangci-lint run --concurrency=2
+
+.PHONY:
+schema-gen:
+	pg_dump --schema-only --no-owner --no-comments --no-privileges --format=p --file=./api/schema.sql ${DATABASE_URL}
+
+.PHONY:
+queries-gen:
+	cd tool && sqlc generate
 
 .PHONY:
 codegen-http-server-handler:

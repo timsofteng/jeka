@@ -1,0 +1,18 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "../services/text/adapters/postgres/sqlc/query.sql"
+    schema: "../api/schema.sql"
+    gen:
+      go:
+        package: "sqlc"
+        out: "../services/text/adapters/postgres/sqlc"
+        sql_package: "pgx/v5"
+  # - engine: "postgresql"
+  #   queries: "srv/users/repo/query.sql"
+  #   schema: "../../migrations/schema.sql"
+  #   gen:
+  #     go:
+  #       package: "repo"
+  #       out: "srv/users/repo"
+  #       sql_package: "pgx/v5"

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	apperrors "telegraminput/lib/errors"
+	"telegraminput/lib/logger"
 	"telegraminput/services/httpserver"
 	"telegraminput/services/images"
 	"telegraminput/services/text"
@@ -20,14 +21,17 @@ type Services struct {
 
 type Adapters struct {
 	services Services
+	logger   logger.Logger
 }
 
-func New(services Services) *Adapters {
+func New(logger logger.Logger, services Services) *Adapters {
 	return &Adapters{
 		services: services,
+		logger:   logger,
 	}
 }
 
+//nolint:ireturn
 func (a *Adapters) RandText(
 	ctx context.Context,
 	_ httpserver.RandTextRequestObject,

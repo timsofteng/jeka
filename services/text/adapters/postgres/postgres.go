@@ -3,30 +3,31 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"telegraminput/services/text/adapters/postgres/sqlc"
 	"telegraminput/services/text/entities"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type Postgres struct {
-	conn *pgx.Conn
+	conn    *pgx.Conn
+	queries *sqlc.Queries
 }
 
 func New(db *pgx.Conn) *Postgres {
-	return &Postgres{conn: db}
+	q := sqlc.New(db)
+
+	return &Postgres{conn: db, queries: q}
 }
 
 func (r *Postgres) Rand(ctx context.Context) (entities.RandText, error) {
-	query := `SELECT data FROM text ORDER BY RANDOM() LIMIT 1;`
-	randMsg := ""
-
-	err := r.conn.QueryRow(ctx, query).Scan(&randMsg)
+	textRow, err := r.queries.GetRandText(ctx)
 	if err != nil {
 		return entities.RandText{},
 			fmt.Errorf("failed to fetch text from DB: %w", err)
 	}
 
-	text, err := entities.NewRandText(randMsg)
+	text, err := entities.NewRandText(textRow.Data)
 	if err != nil {
 		return entities.RandText{},
 			fmt.Errorf("failed to create new rand text: %w", err)
@@ -36,22 +37,16 @@ func (r *Postgres) Rand(ctx context.Context) (entities.RandText, error) {
 }
 
 func (r *Postgres) Count(ctx context.Context) (uint, error) {
-	var count uint
-
-	query := `SELECT count(*) FROM text`
-
-	err := r.conn.QueryRow(ctx, query).Scan(&count)
+	count, err := r.queries.CountTexts(ctx)
 	if err != nil {
-		return count, fmt.Errorf("failed to count messages in DB: %w", err)
+		return 0, fmt.Errorf("failed to count messages in DB: %w", err)
 	}
 
-	return count, nil
+	return uint(count), nil
 }
 
 func (r *Postgres) Add(ctx context.Context, message string) error {
-	query := "INSERT INTO text (data) VALUES ($1)"
-
-	_, err := r.conn.Exec(ctx, query, message)
+	_, err := r.queries.CreateText(ctx, message)
 	if err != nil {
 		return fmt.Errorf("failed to insert text to db: %w", err)
 	}

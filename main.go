@@ -83,7 +83,7 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("failed to init telegram service: %w", err)
 	}
 
-	httpSrv := httpSrvAdapter.New(httpSrvAdapter.Services{
+	httpSrv := httpSrvAdapter.New(logger, httpSrvAdapter.Services{
 		Video: videoSrv, Image: imgSrv, Text: textSrv, Voice: voiceSrv,
 	})
 
@@ -94,23 +94,23 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("failed to init http server: %w", err)
 	}
 
-	gErrGr, gCtx := errgroup.WithContext(ctx)
+	errGr, gCtx := errgroup.WithContext(ctx)
 
-	gErrGr.Go(func() error {
+	errGr.Go(func() error {
 		logger.Info("starting telegram server")
 		telegram.Start()
 
 		return nil
 	})
 
-	gErrGr.Go(func() error {
+	errGr.Go(func() error {
 		logger.Info("starting http server")
 
 		return httpServer.Start()
 	})
 
 	// shutdown goroutine
-	gErrGr.Go(func() error {
+	errGr.Go(func() error {
 		<-gCtx.Done()
 		telegram.Stop()
 
@@ -124,7 +124,7 @@ func run(ctx context.Context) error {
 		return nil
 	})
 
-	if err := gErrGr.Wait(); err != nil {
+	if err := errGr.Wait(); err != nil {
 		return fmt.Errorf("error group encountered an error: %w", err)
 	}
 

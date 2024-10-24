@@ -74,7 +74,7 @@ func (t *Telegram) handlers(ctx context.Context) {
 	})
 
 	t.bot.Handle("/rand", func(ctxTb tele.Context) error {
-		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
 		resp, err := t.services.Rand(ctx)
@@ -88,7 +88,7 @@ func (t *Telegram) handlers(ctx context.Context) {
 	})
 
 	t.bot.Handle("/voice", func(ctxTb tele.Context) error {
-		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
 		voice, err := t.services.RandVoice(ctx)
@@ -102,7 +102,7 @@ func (t *Telegram) handlers(ctx context.Context) {
 	})
 
 	textHandler := func(ctxTb tele.Context) error {
-		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
 		resp, err := t.services.RandText(ctx)
@@ -121,7 +121,7 @@ func (t *Telegram) handlers(ctx context.Context) {
 
 	t.bot.Handle(tele.OnReply, func(ctxTb tele.Context) error {
 		if ctxTb.Message().ReplyTo.Sender.Username == t.ownUsername {
-			ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+			ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 			defer cancel()
 
 			resp, err := t.services.Rand(ctx)

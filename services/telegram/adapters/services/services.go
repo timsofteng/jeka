@@ -39,17 +39,13 @@ func (a *Adapters) Rand(ctx context.Context) (any, error) {
 	return a.RandVoice(ctx)
 }
 
-func (a *Adapters) RandVideo(ctx context.Context) (*tele.Video, error) {
+func (a *Adapters) RandVideo(ctx context.Context) (string, error) {
 	resp, err := a.services.Video.RandVideo(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to call Video.RandVideo: %w", err)
+		return "", fmt.Errorf("failed to call Video.RandVideo: %w", err)
 	}
 
-	video := &tele.Video{
-		File: tele.File{FileURL: resp.URL}, Caption: resp.Caption,
-	}
-
-	return video, nil
+	return fmt.Sprintf("%s:\n\n%s", resp.Caption, resp.URL), nil
 }
 
 func (a *Adapters) RandImg(ctx context.Context) (*tele.Photo, error) {

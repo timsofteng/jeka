@@ -3,7 +3,6 @@ package youtube
 import (
 	"crypto/rand"
 	"fmt"
-	"log"
 	"math/big"
 )
 
@@ -98,9 +97,6 @@ func randString(strLen uint) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	res, _ := fns[randLangFn](strLen)
-	log.Printf("res: %s", res)
 
 	return fns[randLangFn](strLen)
 }

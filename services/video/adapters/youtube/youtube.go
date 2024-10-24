@@ -53,7 +53,7 @@ func New(
 // so we will use 1..3 range.
 func mapTriesToQLen(retries uint64) uint {
 	var (
-		maxLen float64 = 3
+		maxLen float64 = 2
 		minLen float64 = 1
 	)
 
@@ -147,7 +147,7 @@ func (y *Yt) videoID(
 	request.LocationRadius(radius)
 	request.Order(order)
 	request.Type("video")
-	request.RegionCode("ua")
+	// request.RegionCode("ua")
 
 	resp, err := request.Do()
 	if err != nil {

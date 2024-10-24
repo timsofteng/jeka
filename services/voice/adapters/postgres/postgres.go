@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/timsofteng/jeka/services/voice/entities"
 
@@ -57,8 +56,6 @@ func (r *Postgres) Add(ctx context.Context, voiceID string) error {
 	if err != nil {
 		return fmt.Errorf("failed to add voice to db: %w", err)
 	}
-
-	log.Print("voice_id added to database: ", voiceID)
 
 	return nil
 }

@@ -5,8 +5,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	apperrors "github.com/timsofteng/jeka/lib/errors"
 	"time"
+
+	apperrors "github.com/timsofteng/jeka/lib/errors"
 )
 
 type httpClient struct {

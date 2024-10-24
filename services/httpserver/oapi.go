@@ -11,10 +11,6 @@ import (
 	middleware "github.com/oapi-codegen/nethttp-middleware"
 )
 
-type Error struct {
-	Message string `json:"message"`
-}
-
 func validationErrorHandler(logger logger.Logger) middleware.ErrorHandler {
 	return func(
 		w http.ResponseWriter, message string, statusCode int,
@@ -24,7 +20,7 @@ func validationErrorHandler(logger logger.Logger) middleware.ErrorHandler {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(statusCode)
 
-		resp := Error{
+		resp := ErrorResponse{
 			Message: message,
 		}
 

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "github.com/timsofteng/jeka/services/grpcserver/pb";
+
+service Jeka {
+	rpc GetRandomText(GetRandomTextRequest) returns(GetRandomTextResponse);
+	rpc CreateRandomText(CreateRandomTextRequest) returns(CreateRandomTextResponse);
+	rpc GetRandomImg(GetRandomImgRequest) returns(GetRandomImgResponse);
+	rpc GetRandomVideo(GetRandomVideoRequest) returns(GetRandomVideoResponse);
+};
+
+message GetRandomTextRequest {};
+message CreateRandomTextRequest {};
+
+message GetRandomTextResponse {
+	string text = 1;
+}
+message CreateRandomTextResponse {};
+
+
+message GetRandomVideoRequest {};
+message GetRandomVideoResponse {
+	string url = 1;
+};
+
+
+message GetRandomImgRequest {
+	string query = 1;
+};
+message GetRandomImgResponse {
+	string url = 1;
+};

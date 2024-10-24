@@ -10,6 +10,7 @@ import (
 
 	"github.com/timsofteng/jeka/lib/logger"
 	"github.com/timsofteng/jeka/lib/postgres"
+	"github.com/timsofteng/jeka/services/grpcserver"
 	"github.com/timsofteng/jeka/services/httpserver"
 	httpSrvAdapter "github.com/timsofteng/jeka/services/httpserver/adapters/services"
 	"github.com/timsofteng/jeka/services/images"
@@ -95,6 +96,10 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("failed to init http server: %w", err)
 	}
 
+	grpcServer := grpcserver.New(grpcserver.Services{
+		Video: videoSrv, Image: imgSrv, Text: textSrv, Voice: voiceSrv,
+	})
+
 	errGr, gCtx := errgroup.WithContext(ctx)
 
 	errGr.Go(func() error {
@@ -110,10 +115,17 @@ func run(ctx context.Context) error {
 		return httpServer.Start()
 	})
 
+	errGr.Go(func() error {
+		logger.Info("starting grpc server")
+
+		return grpcServer.Start(cfg.GRPCServerPort)
+	})
+
 	// shutdown goroutine
 	errGr.Go(func() error {
 		<-gCtx.Done()
 		telegram.Stop()
+		grpcServer.Stop()
 
 		err := httpServer.Stop(ctx)
 		if err != nil {

@@ -11,6 +11,7 @@ type Config struct {
 	BotOwnUsername string `env:"BOT_OWN_USERNAME,notEmpty"`
 	HTTPServerPort string `env:"HTTP_SERVER_PORT,notEmpty"`
 	HTTPServerHost string `env:"HTTP_SERVER_HOST,notEmpty"`
+	GRPCServerPort string `env:"GRPC_SERVER_PORT,notEmpty"`
 }
 
 func ReadConfig() (Config, error) {

@@ -37,6 +37,14 @@ queries-gen:
 	cd tool && sqlc generate
 
 .PHONY:
+proto-gen:
+	protoc \
+		--proto_path=./api/proto \
+		--go_out=./services/grpcserver/pb --go_opt=paths=source_relative \
+		--go-grpc_out=./services/grpcserver/pb --go-grpc_opt=paths=source_relative \
+		./api/proto/*.proto	
+
+.PHONY:
 codegen-http-server-handler:
 	oapi-codegen \
 		-config ./tool/openapi-server.cfg.yaml \

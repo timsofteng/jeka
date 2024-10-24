@@ -6,7 +6,7 @@ build:
 
 .PHONY:
 app:
-	./${APP_NAME}
+	./bin//${APP_NAME}
 
 .PHONY: e
 e:
@@ -30,7 +30,14 @@ lint:
 
 .PHONY:
 schema-gen:
-	pg_dump --schema-only --no-owner --no-comments --no-privileges --format=p --file=./api/schema.sql ${DATABASE_URL}
+	pg_dump \
+		--schema-only \
+		--no-owner \
+		--no-comments \
+		--no-privileges \
+		--format=p \
+		--file=./api/schema.sql \
+		${DATABASE_URL}
 
 .PHONY:
 queries-gen:

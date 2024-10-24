@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"telegraminput/services/images/entities"
+
+	"github.com/timsofteng/jeka/services/images/entities"
 
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/net/context"

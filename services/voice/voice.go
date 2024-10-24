@@ -1,7 +1,7 @@
 package voice
 
 import (
-	"telegraminput/services/voice/ports"
+	"github.com/timsofteng/jeka/services/voice/ports"
 )
 
 type Voice struct{ ports.Repo }

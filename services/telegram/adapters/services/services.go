@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"math/rand/v2"
-	"telegraminput/services/images"
-	"telegraminput/services/text"
-	"telegraminput/services/video"
-	"telegraminput/services/voice"
+
+	"github.com/timsofteng/jeka/services/images"
+	"github.com/timsofteng/jeka/services/text"
+	"github.com/timsofteng/jeka/services/video"
+	"github.com/timsofteng/jeka/services/voice"
 
 	tele "gopkg.in/telebot.v4"
 )

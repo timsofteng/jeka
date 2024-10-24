@@ -2,7 +2,8 @@ package ports
 
 import (
 	"context"
-	"telegraminput/services/voice/entities"
+
+	"github.com/timsofteng/jeka/services/voice/entities"
 )
 
 type RandomText string

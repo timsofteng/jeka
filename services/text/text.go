@@ -1,7 +1,7 @@
 package text
 
 import (
-	"telegraminput/services/text/ports"
+	"github.com/timsofteng/jeka/services/text/ports"
 )
 
 type Text struct{ ports.Repo }

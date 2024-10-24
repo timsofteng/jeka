@@ -3,9 +3,10 @@ package telegram
 import (
 	"context"
 	"fmt"
-	"telegraminput/lib/logger"
-	"telegraminput/services/telegram/ports"
 	"time"
+
+	"github.com/timsofteng/jeka/lib/logger"
+	"github.com/timsofteng/jeka/services/telegram/ports"
 
 	"golang.org/x/sync/errgroup"
 	tele "gopkg.in/telebot.v4"

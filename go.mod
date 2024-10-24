@@ -1,4 +1,4 @@
-module telegraminput
+module github.com/timsofteng/jeka
 
 go 1.22.5
 

@@ -1,7 +1,7 @@
 package images
 
 import (
-	"telegraminput/services/images/ports"
+	"github.com/timsofteng/jeka/services/images/ports"
 )
 
 type Images struct {

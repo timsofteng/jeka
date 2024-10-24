@@ -1,6 +1,6 @@
 package video
 
-import "telegraminput/services/video/ports"
+import "github.com/timsofteng/jeka/services/video/ports"
 
 type Video struct{ ports.Repo }
 

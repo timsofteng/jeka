@@ -2,7 +2,8 @@ package ports
 
 import (
 	"context"
-	"telegraminput/services/images/entities"
+
+	"github.com/timsofteng/jeka/services/images/entities"
 )
 
 type Repo interface {

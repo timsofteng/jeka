@@ -2,7 +2,7 @@ package ports
 
 import (
 	"context"
-	"telegraminput/services/video/entities"
+	"github.com/timsofteng/jeka/services/video/entities"
 )
 
 type Repo interface {

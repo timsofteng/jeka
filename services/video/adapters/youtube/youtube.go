@@ -5,10 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	apperrors "telegraminput/lib/errors"
-	"telegraminput/lib/logger"
-	"telegraminput/services/video/entities"
 	"time"
+
+	apperrors "github.com/timsofteng/jeka/lib/errors"
+	"github.com/timsofteng/jeka/lib/logger"
+	"github.com/timsofteng/jeka/services/video/entities"
 
 	"github.com/cenkalti/backoff/v4"
 	"golang.org/x/sync/errgroup"

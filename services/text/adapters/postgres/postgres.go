@@ -3,8 +3,9 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"telegraminput/services/text/adapters/postgres/sqlc"
-	"telegraminput/services/text/entities"
+
+	"github.com/timsofteng/jeka/services/text/adapters/postgres/sqlc"
+	"github.com/timsofteng/jeka/services/text/entities"
 
 	"github.com/jackc/pgx/v5"
 )

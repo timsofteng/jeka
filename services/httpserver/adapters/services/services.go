@@ -3,13 +3,14 @@ package services
 import (
 	"context"
 	"fmt"
-	apperrors "telegraminput/lib/errors"
-	"telegraminput/lib/logger"
-	"telegraminput/services/httpserver"
-	"telegraminput/services/images"
-	"telegraminput/services/text"
-	"telegraminput/services/video"
-	"telegraminput/services/voice"
+
+	apperrors "github.com/timsofteng/jeka/lib/errors"
+	"github.com/timsofteng/jeka/lib/logger"
+	"github.com/timsofteng/jeka/services/httpserver"
+	"github.com/timsofteng/jeka/services/images"
+	"github.com/timsofteng/jeka/services/text"
+	"github.com/timsofteng/jeka/services/video"
+	"github.com/timsofteng/jeka/services/voice"
 )
 
 type Services struct {

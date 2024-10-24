@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"telegraminput/services/voice/entities"
+
+	"github.com/timsofteng/jeka/services/voice/entities"
 
 	"github.com/jackc/pgx/v5"
 )

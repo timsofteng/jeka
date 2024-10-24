@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	apperrors "telegraminput/lib/errors"
+	apperrors "github.com/timsofteng/jeka/lib/errors"
 	"time"
 )
 

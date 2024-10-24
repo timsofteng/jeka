@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"telegraminput/lib/logger"
+
+	"github.com/timsofteng/jeka/lib/logger"
 
 	middleware "github.com/oapi-codegen/nethttp-middleware"
 )

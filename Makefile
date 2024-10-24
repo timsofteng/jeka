@@ -1,6 +1,4 @@
-.DELETE_ON_ERROR:
-
-.PHONY:
+# .DELETE_ON_ERROR:
 
 .PHONY:
 build:

@@ -27,10 +27,14 @@ const (
 	maxRetries uint64 = 4
 )
 
-func New(logger logger.Logger, apiKey string) (*Yt, error) {
+func New(
+	ctx context.Context,
+	logger logger.Logger,
+	apiKey string,
+) (*Yt, error) {
 	const timeout = 10 * time.Second
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	ytClient, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))

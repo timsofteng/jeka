@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 	"telegraminput/lib/logger"
 	"telegraminput/lib/postgres"
 	"telegraminput/services/httpserver"
@@ -18,17 +21,25 @@ import (
 	"telegraminput/services/video/adapters/youtube"
 	"telegraminput/services/voice"
 	voicePGAdapter "telegraminput/services/voice/adapters/postgres"
+
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
-	err := run()
-	if err != nil {
+	ctx, stop := signal.NotifyContext(
+		context.Background(), syscall.SIGINT, syscall.SIGTERM)
+
+	if err := run(ctx); err != nil {
 		log.Printf("root err: %+v", err)
+		stop()
 		os.Exit(1)
 	}
+
+	stop()
 }
 
-func run() error {
+//nolint:funlen
+func run(ctx context.Context) error {
 	cfg, err := ReadConfig()
 	if err != nil {
 		return err
@@ -36,7 +47,7 @@ func run() error {
 
 	logger := logger.New(cfg.LogLevel)
 
-	videoRepo, err := youtube.New(logger, cfg.YtAPIKey)
+	videoRepo, err := youtube.New(ctx, logger, cfg.YtAPIKey)
 	if err != nil {
 		return fmt.Errorf("failed to init youtube repo adapter: %w", err)
 	}
@@ -46,7 +57,7 @@ func run() error {
 	imgRepo := unsplash.New(cfg.UnsplashAPIKey)
 	imgSrv := images.New(imgRepo)
 
-	postgres, err := postgres.New(cfg.DatabaseURL)
+	postgres, err := postgres.New(ctx, cfg.DatabaseURL)
 	if err != nil {
 		return fmt.Errorf("failed to init postgres db: %w", err)
 	}
@@ -61,7 +72,9 @@ func run() error {
 		Video: videoSrv, Image: imgSrv, Text: textSrv, Voice: voiceSrv,
 	})
 
-	telegram, err := telegram.New(logger,
+	telegram, err := telegram.New(
+		ctx,
+		logger,
 		cfg.Token,
 		cfg.BotOwnUsername,
 		tgAdoptedServices,
@@ -70,20 +83,50 @@ func run() error {
 		return fmt.Errorf("failed to init telegram service: %w", err)
 	}
 
-	go telegram.Start()
-
 	httpSrv := httpSrvAdapter.New(httpSrvAdapter.Services{
 		Video: videoSrv, Image: imgSrv, Text: textSrv, Voice: voiceSrv,
 	})
 
 	httpServer, err := httpserver.New(
-		logger, cfg.HTTPServerHost, cfg.HTTPServerPort, httpSrv,
+		ctx, logger, cfg.HTTPServerHost, cfg.HTTPServerPort, httpSrv,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to init http server: %w", err)
 	}
 
-	httpServer.Start()
+	gErrGr, gCtx := errgroup.WithContext(ctx)
+
+	gErrGr.Go(func() error {
+		logger.Info("starting telegram server")
+		telegram.Start()
+
+		return nil
+	})
+
+	gErrGr.Go(func() error {
+		logger.Info("starting http server")
+
+		return httpServer.Start()
+	})
+
+	// shutdown goroutine
+	gErrGr.Go(func() error {
+		<-gCtx.Done()
+		telegram.Stop()
+
+		err := httpServer.Stop(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to stop http server: %w", err)
+		}
+
+		logger.Info("tg and http servers stoped correct")
+
+		return nil
+	})
+
+	if err := gErrGr.Wait(); err != nil {
+		return fmt.Errorf("error group encountered an error: %w", err)
+	}
 
 	return nil
 }

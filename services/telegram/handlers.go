@@ -18,7 +18,7 @@ const helpMsg = `/help - инструкция
 /taksa - такса`
 
 //nolint:funlen
-func (t *Telegram) handlers() {
+func (t *Telegram) handlers(ctx context.Context) {
 	t.bot.Handle("/test", func(c tele.Context) error {
 		return c.Send("Hello!")
 	})
@@ -28,7 +28,7 @@ func (t *Telegram) handlers() {
 	})
 
 	t.bot.Handle("/video", func(ctxTb tele.Context) error {
-		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
 		resp, err := t.services.RandVideo(ctx)
@@ -42,7 +42,7 @@ func (t *Telegram) handlers() {
 	})
 
 	t.bot.Handle("/rand_img", func(ctxTb tele.Context) error {
-		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
 		url, caption, err := t.services.RandImg(ctx)
@@ -58,7 +58,7 @@ func (t *Telegram) handlers() {
 	})
 
 	t.bot.Handle("/taksa", func(ctxTb tele.Context) error {
-		ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+		ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 		defer cancel()
 
 		url, caption, err := t.services.Taksa(ctx)

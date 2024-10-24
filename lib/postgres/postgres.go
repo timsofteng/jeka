@@ -12,10 +12,10 @@ type Postgres struct {
 	Conn *pgx.Conn
 }
 
-func New(dbURL string) (Postgres, error) {
+func New(ctx context.Context, dbURL string) (Postgres, error) {
 	const timeout = 3 * time.Second
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	conn, err := pgx.Connect(ctx, dbURL)

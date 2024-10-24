@@ -1,11 +1,13 @@
 package telegram
 
 import (
+	"context"
 	"fmt"
 	"telegraminput/lib/logger"
 	"telegraminput/services/telegram/ports"
 	"time"
 
+	"golang.org/x/sync/errgroup"
 	tele "gopkg.in/telebot.v4"
 )
 
@@ -17,6 +19,7 @@ type Telegram struct {
 }
 
 func New(
+	ctx context.Context,
 	logger logger.Logger,
 	token string,
 	ownUsername string,
@@ -33,9 +36,23 @@ func New(
 		},
 	}
 
-	bot, err := tele.NewBot(pref)
-	if err != nil {
-		return nil, fmt.Errorf("failed to init tg bot: %w", err)
+	gErrGr, ctx := errgroup.WithContext(ctx)
+
+	var bot *tele.Bot
+
+	gErrGr.Go(func() error {
+		var err error
+
+		bot, err = tele.NewBot(pref)
+		if err != nil {
+			return fmt.Errorf("failed to init tg bot: %w", err)
+		}
+
+		return nil
+	})
+
+	if err := gErrGr.Wait(); err != nil {
+		return nil, fmt.Errorf("error group encountered an error: %w", err)
 	}
 
 	telegram := &Telegram{
@@ -45,7 +62,7 @@ func New(
 		ownUsername: ownUsername,
 	}
 
-	telegram.handlers()
+	telegram.handlers(ctx)
 
 	return telegram, nil
 }

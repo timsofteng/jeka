@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -14,11 +15,11 @@ type HTTPServer struct {
 }
 
 func New(
+	ctx context.Context,
 	logger logger.Logger,
 	host string, port string,
 	services StrictServerInterface,
 ) (*HTTPServer, error) {
-	ctx := context.Background()
 	mux := http.NewServeMux()
 
 	handlers, err := WrapToOapiHandler(logger, mux, services)
@@ -45,10 +46,25 @@ func New(
 	return &HTTPServer{server: server}, nil
 }
 
-func (h *HTTPServer) Start() {
-	h.server.ListenAndServe()
+func (h *HTTPServer) Start() error {
+	err := h.server.ListenAndServe()
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return fmt.Errorf("failed to listen and serve http: %w", err)
+	}
+
+	return nil
 }
 
-func (h *HTTPServer) Stop(ctx context.Context) {
-	h.server.Shutdown(ctx)
+func (h *HTTPServer) Stop(ctx context.Context) error {
+	const timeout = 5 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+
+	defer cancel()
+
+	err := h.server.Shutdown(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to shutdown http server: %w", err)
+	}
+
+	return nil
 }
